@@ -196,6 +196,8 @@ scp pi@raspberrypi.local:/home/pi/pimex-service.png .\pimex-service.png
 
 ## 串口與量測狀態
 
+ESP32 工程師進行整合測試時，請依 [測試與 Debug SOP](ESP32-DEBUG-SOP.md) 執行並保存診斷包。
+
 `--port /dev/ttyACM0` 啟動時會自動開啟串口。若 USB 尚未出現，每 2 秒重試；使用者可由連線設定切換。首次連線成功後再發生斷線，須手動處理，不會自動恢復量測。
 
 服務啟動只會開啟操作介面及串口，仍需使用者選取參數、孔位並按 Start。實機 CV 要先收到 `FW_VERSION: 028`；若錯過 ESP32 開機訊息，可保持程式連線並重新啟動 ESP32，確認韌體回覆後再量測。LF／CRLF 仍需依實機確認；CA 實機流程尚未啟用，詳見主 [README](../README.md)。

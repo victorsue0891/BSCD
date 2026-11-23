@@ -153,6 +153,8 @@ sh /home/pi/Photoelectromagnetic-electrochemical/deploy/start-session.sh
 
 ## 7. 驗證更新成功
 
+更新後交給 ESP32 工程師測試，請使用 [ESP32 測試與 Debug SOP](ESP32-DEBUG-SOP.md)，其中列出命令順序、案例及 Log 判讀方式。
+
 Remote shell 執行：
 
 ```sh

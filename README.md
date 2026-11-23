@@ -175,6 +175,8 @@ RX/TX 在量測中持續寫入；正常結束、中止及錯誤時自動匯出 C
 
 ## 連線診斷與 USB／SD 卡匯出
 
+提供給 ESP32 工程師的操作文件：[測試與 Debug SOP](deploy/ESP32-DEBUG-SOP.md)，包含上電順序、CV 基準、Stop／異常測試、Log 匯出與問題回報範本。
+
 2026-11-23 新增程式啟動起的診斷紀錄，不必先進入「通訊紀錄」或按 Start。預設存於 `~/PIMEX/diagnostics/`，與量測資料 `~/PIMEX/data/` 分開；每次啟動建立新的 `session_時間_識別碼/`。若自訂 `--data-dir`，診斷目錄預設為該資料夾的同層 `diagnostics/`，也可明確指定：
 
 ```sh
