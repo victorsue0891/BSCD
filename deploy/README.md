@@ -1,5 +1,7 @@
 # Raspberry Pi 部署與維護流程
 
+**目前只能用 Raspberry Pi Connect 連線時，請使用 [Connect 部署 SOP](CONNECT-SOP.md)**：由 Pi 從公開 GitHub 下載、測試、備份替換及還原，不需要 SSH／SCP。下文保留原本區域網路部署流程。
+
 本文件依 2026-11-03 實際部署流程整理，於 2026-11-04 補齊可重複操作的步驟。實際傳輸透過 SSH／SFTP；下方使用 Windows 內建 `ssh`、`scp` 與 `tar` 示範相同步驟，不需要另裝部署用 Python 套件。
 
 公開版本以 `raspberrypi.local` 取代現場連線位址；執行 SSH／SCP 前請換成你的 Pi IP 或主機名稱。以下本機與 Pi 安裝路徑亦請依環境調整。

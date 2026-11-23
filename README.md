@@ -44,6 +44,8 @@ python3 main.py --fullscreen --port /dev/ttyACM0 --line-ending LF
 
 ### Raspberry Pi 開機服務（pi 帳號、labwc 桌面）
 
+**只能透過 Raspberry Pi Connect 存取 Pi？** 請依 [Connect 部署 SOP](deploy/CONNECT-SOP.md) 操作：從 GitHub 下載、驗證、備份替換、啟動全螢幕服務及必要時還原。
+
 完整的 Windows 打包／傳輸、Pi 套件安裝、串口權限、桌面自動登入、服務安裝與重新開機驗證流程，見 **[Raspberry Pi 部署與維護流程](deploy/README.md)**。文件也記錄 2026-11-03 實際部署結果與尚待確認的 ESP32 韌體回覆。
 
 程式安裝於 `/home/pi/Photoelectromagnetic-electrochemical`，資料存於 `/home/pi/PIMEX/data`。先安裝上述 apt 套件，並啟用 `pi` 桌面自動登入；帳號須屬於 `dialout` 群組。以 `pi` 執行：
