@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=PIMEX Service
+Comment=Start the fullscreen instrument systemd service after desktop login
+Exec=/bin/sh /home/pi/Photoelectromagnetic-electrochemical/deploy/start-session.sh
+Terminal=false
+X-GNOME-Autostart-enabled=true

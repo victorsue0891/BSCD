@@ -1,0 +1,28 @@
+__pycache__/
+.pytest_cache/
+*.pyc
+.venv/
+data/
+artifacts/
+diagnostics/
+release/
+
+# Local reference documents and design exports (not runtime dependencies).
+/UI/
+/esp32-cmd-doc/
+/*.docx
+/*.xlsx
+/QA-*.md
+/CommandLog*.txt
+
+# Local credentials and machine-specific settings.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+known_hosts*
+.idea/
+.vscode/
