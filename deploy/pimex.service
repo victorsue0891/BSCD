@@ -7,7 +7,7 @@ StartLimitBurst=5
 [Service]
 Type=simple
 WorkingDirectory=%h/Photoelectromagnetic-electrochemical
-ExecStart=/usr/bin/python3 -u %h/Photoelectromagnetic-electrochemical/main.py --fullscreen --port /dev/ttyACM0 --line-ending LF --data-dir %h/PIMEX/data
+ExecStart=/usr/bin/python3 -u %h/Photoelectromagnetic-electrochemical/main.py --fullscreen --port /dev/ttyUSB0 --line-ending LF --data-dir %h/PIMEX/data
 Environment=PYTHONUNBUFFERED=1
 Restart=always
 RestartSec=5

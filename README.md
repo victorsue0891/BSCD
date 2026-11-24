@@ -1,6 +1,6 @@
 # BSCD · Raspberry Pi 光電磁電化學操作介面
 
-以 **PyQt6 Widgets** 實作的離線桌面程式，目標設備為 **Raspberry Pi Compute Module 4（CM4）、Raspberry Pi OS 64-bit、800×600 螢幕**，也可在 Windows 開發與模擬。不需瀏覽器、網頁服務、線上字型或 ESP32 即可操作模擬器。ESP32 可於「連線」手動選擇，或以 `--port` 指定；部署設定的開機服務使用 `/dev/ttyACM0`。
+以 **PyQt6 Widgets** 實作的離線桌面程式，目標設備為 **Raspberry Pi Compute Module 4（CM4）、Raspberry Pi OS 64-bit、800×600 螢幕**，也可在 Windows 開發與模擬。不需瀏覽器、網頁服務、線上字型或 ESP32 即可操作模擬器。ESP32 可於「連線」手動選擇，或以 `--port` 指定；部署設定的開機服務使用 `/dev/ttyUSB0`。
 
 公開 repository 包含執行程式、必要素材、測試、部署設定及測試用韌體紀錄 `RefTxt1006.txt`。文中提及的原始設計／硬體文件留在本機，不包含在 repository；執行程式及測試不依賴這些文件。
 
@@ -37,7 +37,7 @@ python3 main.py --fullscreen
 指定 ESP32 串口並以全螢幕啟動：
 
 ```sh
-python3 main.py --fullscreen --port /dev/ttyACM0 --line-ending LF
+python3 main.py --fullscreen --port /dev/ttyUSB0 --line-ending LF
 ```
 
 `--port` 在開機時自動連線；USB 尚未出現時每 2 秒重試，介面仍可操作。切換模擬、重播或開啟連線設定會取消等待。首次連線成功後若斷線，須手動重新連線，不會自動恢復量測。`--demo`、`--replay` 與 `--port` 互斥；換行可用 `--line-ending CRLF` 調整。
@@ -62,7 +62,7 @@ sh deploy/start-session.sh
 
 上面的 `sh deploy/start-session.sh` 應在 **Pi 本機圖形桌面的終端機**執行。若從 SSH 操作，請依部署文件確認 systemd 使用者環境已匯入桌面的顯示設定，再執行 `systemctl --user start pimex.service`。
 
-`pimex.service` 以 pi 的 systemd 使用者服務執行，啟動參數包含全螢幕及 `/dev/ttyACM0`。labwc 的 XDG autostart 會在桌面就緒後匯入顯示環境並啟動此服務，避免在 Wayland 尚未就緒時啟動 GUI。程式退出後 5 秒重新啟動；需暫停時使用 `stop`。服務只開啟串口，不會自行開始量測；仍需收到 `FW_VERSION: 028` 才能開始實機 CV。
+`pimex.service` 以 pi 的 systemd 使用者服務執行，啟動參數包含全螢幕及 `/dev/ttyUSB0`。labwc 的 XDG autostart 會在桌面就緒後匯入顯示環境並啟動此服務，避免在 Wayland 尚未就緒時啟動 GUI。程式退出後 5 秒重新啟動；需暫停時使用 `stop`。服務只開啟串口，不會自行開始量測；仍需收到 `FW_VERSION: 028` 才能開始實機 CV。
 
 ```sh
 systemctl --user status pimex.service
@@ -73,7 +73,7 @@ systemctl --user stop pimex.service
 
 永久取消開機啟動時，需同時執行 `systemctl --user disable --now pimex.service`，並移走 `~/.config/autostart/pimex.desktop`。桌面入口與 service 設定原始檔保留在 `deploy/`。
 
-在「連線」選擇裝置，例如 `/dev/serial0`、`/dev/ttyUSB0` 或 `/dev/ttyACM0`。串口採 **115200、8N1、無流量控制**；送出換行可選 LF 或 CRLF，須依實機確認。程式不會自動重置 ESP32，實機開始前必須收到 `FW_VERSION: 028`；若連線時錯過開機訊息，保持連線並重新啟動 ESP32。GPIO UART 需先由 Raspberry Pi OS 設定啟用並停用該埠的登入主控台。
+在「連線」選擇本機裝置 `/dev/ttyUSB0`；程式也支援其他串口，例如 `/dev/serial0` 或 `/dev/ttyACM0`。串口採 **115200、8N1、無流量控制**；送出換行可選 LF 或 CRLF，須依實機確認。程式不會自動重置 ESP32，實機開始前必須收到 `FW_VERSION: 028`；若連線時錯過開機訊息，保持連線並重新啟動 ESP32。GPIO UART 需先由 Raspberry Pi OS 設定啟用並停用該埠的登入主控台。
 
 OS 與 Qt6 套件依據：[Raspberry Pi OS 官方下載頁](https://www.raspberrypi.com/software/operating-systems/)、[Debian PyQt6 套件](https://packages.debian.org/trixie/python3-pyqt6)、[Debian QtSerialPort 套件](https://packages.debian.org/trixie/python3-pyqt6.qtserialport)、[Qt6 Wayland 平台套件](https://packages.debian.org/trixie/qt6-wayland)、[Qt QSerialPort 官方文件](https://doc.qt.io/qt-6/qserialport.html)。保留桌面環境預設的 Wayland／X11 選擇，不強制指定 Qt 平台。使用非阻塞 `readyRead` 事件，未在 UI 執行緒呼叫等待串口的阻塞函式。
 
@@ -180,7 +180,7 @@ RX/TX 在量測中持續寫入；正常結束、中止及錯誤時自動匯出 C
 2026-11-23 新增程式啟動起的診斷紀錄，不必先進入「通訊紀錄」或按 Start。預設存於 `~/PIMEX/diagnostics/`，與量測資料 `~/PIMEX/data/` 分開；每次啟動建立新的 `session_時間_識別碼/`。若自訂 `--data-dir`，診斷目錄預設為該資料夾的同層 `diagnostics/`，也可明確指定：
 
 ```sh
-python3 main.py --fullscreen --port /dev/ttyACM0 --data-dir /home/pi/PIMEX/data --diagnostics-dir /home/pi/PIMEX/diagnostics
+python3 main.py --fullscreen --port /dev/ttyUSB0 --data-dir /home/pi/PIMEX/data --diagnostics-dir /home/pi/PIMEX/diagnostics
 ```
 
 **本版以記錄與診斷為主，不新增 ESP32 握手命令。** 串口成功開啟後顯示「等待主板版本」；收到 `FW_VERSION: 028` 才允許開始實機 CV。不傳送 ACK／READY／版本查詢，不要求主板改成每 10 ms 重送。收到主板重新開機訊息時清除原版本確認，量測中仍走既有故障處理。重複版本訊息會完整送入診斷佇列，介面合併連續重複的狀態文字。若主板只送一次且發生在串口開啟之前，Pi 無法補回該訊息，仍須保持連線後重啟主板。

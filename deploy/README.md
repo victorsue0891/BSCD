@@ -4,6 +4,8 @@
 
 本文件依 2026-11-03 實際部署流程整理，於 2026-11-04 補齊可重複操作的步驟。實際傳輸透過 SSH／SFTP；下方使用 Windows 內建 `ssh`、`scp` 與 `tar` 示範相同步驟，不需要另裝部署用 Python 套件。
 
+2026-11-24 依設備確認，現行 ESP32 串口修正為 `/dev/ttyUSB0`；下列設定與操作指令已同步修正。歷史部署結果保留作參考，不能當成本次修正的實機驗證。
+
 公開版本以 `raspberrypi.local` 取代現場連線位址；執行 SSH／SCP 前請換成你的 Pi IP 或主機名稱。以下本機與 Pi 安裝路徑亦請依環境調整。
 
 ## 部署目標與結果
@@ -17,7 +19,7 @@
 | 實際螢幕 | 1024×600；程式使用 `--fullscreen` 填滿畫面 |
 | 程式路徑 | `/home/pi/Photoelectromagnetic-electrochemical` |
 | 量測資料 | `/home/pi/PIMEX/data` |
-| ESP32 串口 | `/dev/ttyACM0`；115200、8N1、無流量控制、LF |
+| ESP32 串口 | `/dev/ttyUSB0`；115200、8N1、無流量控制、LF |
 | 開機服務 | `pi` 的 systemd 使用者服務 `pimex.service` |
 
 部署時 Windows 與 Pi 均通過 29 項測試；重新開機後服務自動啟動，並以實際螢幕截圖確認全螢幕首頁。串口成功開啟，但當時尚未收到 `FW_VERSION: 028`，因此未宣稱已完成實機量測驗收。
@@ -40,7 +42,7 @@ id
 systemctl get-default
 systemctl status display-manager --no-pager
 loginctl list-sessions
-ls -l /dev/ttyACM0
+ls -l /dev/ttyUSB0
 ls -l /dev/serial/by-id/
 ```
 
@@ -111,7 +113,7 @@ python3 main.py --demo --fullscreen
 關閉模擬視窗後，可手動啟動實機連線模式：
 
 ```sh
-python3 main.py --fullscreen --port /dev/ttyACM0 --line-ending LF
+python3 main.py --fullscreen --port /dev/ttyUSB0 --line-ending LF
 ```
 
 服務已啟動時，先在介面停止量測並確認完成，再執行 `systemctl --user stop pimex.service`，避免同時啟動兩份程式搶占串口。
@@ -175,10 +177,10 @@ systemctl --user is-enabled pimex.service
 systemctl --user status pimex.service --no-pager
 systemctl --user show pimex.service -p ActiveState -p SubState -p MainPID -p NRestarts
 journalctl _SYSTEMD_USER_UNIT=pimex.service -b --no-pager -n 30
-fuser -v /dev/ttyACM0
+fuser -v /dev/ttyUSB0
 ```
 
-本次重新開機後確認為 `enabled`、`active (running)`、`NRestarts=0`，日誌出現「UART 已連線：/dev/ttyACM0」。SSH 比桌面較早就緒時，服務可能短暫顯示 `inactive`；應待桌面登入完成再檢查。
+先前部署重新開機後確認為 `enabled`、`active (running)`、`NRestarts=0`，日誌確認 UART 已連線；這是歷史驗證，不代表本次串口修正已在 Pi 重驗。SSH 比桌面較早就緒時，服務可能短暫顯示 `inactive`；應待桌面登入完成再檢查。
 
 本機螢幕應直接顯示 PIMEX 全螢幕首頁。這台 Pi 也可透過 SSH 擷取桌面驗證：
 
@@ -198,7 +200,7 @@ scp pi@raspberrypi.local:/home/pi/pimex-service.png .\pimex-service.png
 
 ESP32 工程師進行整合測試時，請依 [測試與 Debug SOP](ESP32-DEBUG-SOP.md) 執行並保存診斷包。
 
-`--port /dev/ttyACM0` 啟動時會自動開啟串口。若 USB 尚未出現，每 2 秒重試；使用者可由連線設定切換。首次連線成功後再發生斷線，須手動處理，不會自動恢復量測。
+`--port /dev/ttyUSB0` 啟動時會自動開啟串口。若 USB 尚未出現，每 2 秒重試；使用者可由連線設定切換。首次連線成功後再發生斷線，須手動處理，不會自動恢復量測。
 
 服務啟動只會開啟操作介面及串口，仍需使用者選取參數、孔位並按 Start。實機 CV 要先收到 `FW_VERSION: 028`；若錯過 ESP32 開機訊息，可保持程式連線並重新啟動 ESP32，確認韌體回覆後再量測。LF／CRLF 仍需依實機確認；CA 實機流程尚未啟用，詳見主 [README](../README.md)。
 

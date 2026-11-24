@@ -13,11 +13,11 @@
 | Pi 程式 | 已依 [Connect 部署 SOP](CONNECT-SOP.md) 更新；「通訊紀錄」內有「匯出診斷 ZIP」按鈕。只有舊版訊息視窗時，先更新。 |
 | 遠端操作 | Raspberry Pi Connect 的 Screen sharing 用於操作介面；Remote shell 用於查詢服務與收集系統資訊。所有 shell 指令在 Pi 以 `pi` 執行。 |
 | 主板識別 | 記錄板號／硬體版本、韌體版本、燒錄檔或 firmware commit、USB 接法與供電方式。只寫「028」可能無法區分不同編譯。 |
-| 串口 | `/dev/ttyACM0`、115200、8 data bits、No parity、1 stop bit、無流量控制。Pi 預設送出 LF。 |
+| 串口 | `/dev/ttyUSB0`、115200、8 data bits、No parity、1 stop bit、無流量控制。Pi 預設送出 LF。 |
 | 接收換行 | Pi 以 LF 分行，可接收 LF 或 CRLF；只有 CR 不會完成一行。 |
 | 測試負載 | 使用工程師確認可接受測試電壓／光源設定的測試板或負載；涉及拔線、重啟與逾時的案例安排在可中斷的測試環境。 |
 | 外接儲存 | 準備可寫入的 USB 隨身碟或 USB SD 卡讀卡機，由 Pi 桌面掛載；此處指外接媒體，不是取出 Pi 的系統卡。 |
-| 串口占用 | 測試期間只由 PIMEX 開啟同一串口。不要另開 Serial Monitor、minicom、screen 或 `cat /dev/ttyACM0`，避免競爭／分走接收資料。 |
+| 串口占用 | 測試期間只由 PIMEX 開啟同一串口。不要另開 Serial Monitor、minicom、screen 或 `cat /dev/ttyUSB0`，避免競爭／分走接收資料。 |
 
 在 Remote shell 記錄以下輸出，測試中不要更新程式或更換韌體，以免前後版本混在一起：
 
@@ -27,7 +27,7 @@ git -C /home/pi/Photoelectromagnetic-electrochemical log -1 --oneline
 git -C /home/pi/Photoelectromagnetic-electrochemical status --short
 systemctl --user status pimex.service --no-pager
 systemctl --user show pimex.service -p MainPID -p ActiveState -p SubState -p NRestarts
-ls -l /dev/ttyACM0
+ls -l /dev/ttyUSB0
 id -nG pi
 df -h /home/pi
 ```
@@ -44,7 +44,7 @@ Pi 預設資料位置：
 ## 2. 上電與版本接收測試
 
 1. 讓 Pi 完成桌面登入，確認 PIMEX 服務已啟動。
-2. 在首頁查看串口狀態；必要時開「連線設定」，選 `/dev/ttyACM0`、LF，再按「連接 UART」。不要誤選模擬器。
+2. 在首頁查看串口狀態；必要時開「連線設定」，選 `/dev/ttyUSB0`、LF，再按「連接 UART」。不要誤選模擬器。
 3. 記下主板上電／Reset 的實際時間。若主板還未上電，先上電；若已經錯過版本訊息，確認主板未在量測，再按硬體允許的方式 Reset。
 4. 觀察首頁狀態，並在「通訊紀錄」確認 `FW_VERSION: 028`。
 5. 尚未按 Start 前，匯出一份診斷 ZIP，作為純開機／連線基準。
@@ -61,7 +61,7 @@ Pi 預設資料位置：
 
 **上電順序的限制：**若主板只在開機送一次版本，且發生在 Pi 開啟串口前，就可能漏接。即使「Pi 先開」，主板上電後 USB 裝置才出現，也仍有 USB 列舉／開埠的時間差。Reset 若會使 USB 斷線，不能假設 Pi 持續持有原串口；首次成功連線後再斷線，目前需要手動重連，不會自動恢復量測。
 
-記錄「Pi 先開／主板先開／同時上電」、「Reset 是否讓 `/dev/ttyACM0` 消失」、「是否重新連接 UART」。若始終無法在開埠後收到版本，將此列為待協調的啟動時序問題，不宣稱此次 Log 功能已解決握手。
+記錄「Pi 先開／主板先開／同時上電」、「Reset 是否讓 `/dev/ttyUSB0` 消失」、「是否重新連接 UART」。若始終無法在開埠後收到版本，將此列為待協調的啟動時序問題，不宣稱此次 Log 功能已解決握手。
 
 ## 3. 單欄 CV 基準測試
 

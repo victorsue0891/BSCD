@@ -1,6 +1,6 @@
 # 透過 Raspberry Pi Connect 更新 BSCD：操作 SOP
 
-適用於目前這台已安裝 PIMEX 的 Raspberry Pi：帳號 `pi`、Wayland 桌面、程式路徑 `/home/pi/Photoelectromagnetic-electrochemical`、使用者服務 `pimex.service`、ESP32 `/dev/ttyACM0`。本文件提供操作流程，並不表示已替遠端 Pi 執行更新。
+適用於目前這台已安裝 PIMEX 的 Raspberry Pi：帳號 `pi`、Wayland 桌面、程式路徑 `/home/pi/Photoelectromagnetic-electrochemical`、使用者服務 `pimex.service`、ESP32 `/dev/ttyUSB0`。本文件提供操作流程，並不表示已替遠端 Pi 執行更新。
 
 全程透過 Connect 操作 Pi，由 **Pi 自己從公開 GitHub repository 下載程式**，不需要 Windows SSH／SCP，也不需要在 Pi 登入 GitHub 或安裝 gh CLI。Pi 仍須能連上 GitHub 與 apt 套件來源。
 
@@ -163,7 +163,7 @@ systemctl --user status pimex.service --no-pager
 systemctl --user show pimex.service -p ActiveState -p SubState -p NRestarts
 journalctl _SYSTEMD_USER_UNIT=pimex.service -b --no-pager -n 60
 git -C /home/pi/Photoelectromagnetic-electrochemical log -1 --oneline
-ls -l /dev/ttyACM0
+ls -l /dev/ttyUSB0
 ```
 
 確認 `enabled`、`active (running)`，且稍後再查時 `NRestarts` 沒有持續增加。`git log` 的 commit 應與第 4 步下載版本相同；只有 active 不代表串口與量測已驗收。
@@ -229,7 +229,7 @@ Connect 會暫時斷線。等待裝置重新上線，再開 Remote shell 與 Scr
 | 全螢幕遮住桌面 | 確認量測停止後，從 Remote shell 停止 `pimex.service`，再回 Screen sharing 操作桌面。 |
 | `Failed to connect to bus` | 確認 Remote shell 是 `pi`，未使用 `sudo systemctl --user`；改由 Screen sharing 的桌面 Terminal 操作。 |
 | `could not connect to display` 或 Wayland 平台錯誤 | 確認已登入桌面、已安裝 `qt6-wayland`，依第 6 步從桌面 Terminal 匯入環境。 |
-| `/dev/ttyACM0` 不存在 | 檢查 ESP32 電源與 USB；程式會等待串口出現，但不能因此認定硬體已連線。 |
+| `/dev/ttyUSB0` 不存在 | 檢查 ESP32 電源與 USB；程式會等待串口出現，但不能因此認定硬體已連線。 |
 | 串口 Permission denied | 執行 `id -nG pi` 確認 `dialout`；缺少時以 `sudo usermod -aG dialout pi` 加入，安排重新登入／開機讓桌面取得權限。 |
 | 服務不斷重啟 | 先 `systemctl --user stop pimex.service`，讀取 journal；必要時依第 9 節還原。 |
 | 瀏覽器中斷 | 重連後執行 `tmux new-session -A -s bscd-deploy`；檢查原操作結果再繼續。 |

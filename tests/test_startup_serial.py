@@ -22,11 +22,11 @@ def test_startup_retries_late_device_without_sending_commands(qapp, tmp_path, mo
 
     monkeypatch.setattr("instrument_ui.app.SerialTransport", LateSerial)
     window = MainWindow(tmp_path)
-    window.connect_startup_serial("/dev/ttyACM0", "CRLF")
+    window.connect_startup_serial("/dev/ttyUSB0", "CRLF")
     assert window.startup_serial_timer.isActive()
     assert window.controller.transport is None
     window._try_startup_serial()
-    assert attempts == [("/dev/ttyACM0", "CRLF")] * 2
+    assert attempts == [("/dev/ttyUSB0", "CRLF")] * 2
     assert window.controller.transport.connected
     assert not window.startup_serial_timer.isActive()
     assert window.controller.firmware == "unknown"
@@ -48,7 +48,7 @@ def test_switch_to_demo_cancels_pending_serial(qapp, tmp_path, monkeypatch):
 
     monkeypatch.setattr("instrument_ui.app.SerialTransport", MissingSerial)
     window = MainWindow(tmp_path)
-    window.connect_startup_serial("/dev/ttyACM0")
+    window.connect_startup_serial("/dev/ttyUSB0")
     assert window.startup_serial_timer.isActive()
     window.connect_demo()
     window._try_startup_serial()
